@@ -1,0 +1,31 @@
+<!DOCTYPE html><html lang='es'><head><meta charset='UTF-8'><meta name='viewport' content='width=device-width,initial-scale=1'><title>Simulación 06</title>
+<style>
+*{box-sizing:border-box;font-family:Segoe UI,sans-serif}body{margin:0;background:#081018;color:#fff;display:flex;justify-content:center;align-items:center;height:100vh}.chat{width:420px;height:700px;background:#111827;border-radius:24px;overflow:hidden;border:1px solid #2d3748;display:flex;flex-direction:column}.header{padding:18px;background:#1e293b;color:#8bd3ff;font-weight:700}.messages{flex:1;padding:18px;overflow:auto}.bot,.user{padding:12px 16px;border-radius:16px;max-width:80%;margin-bottom:12px}.bot{background:#1f2937}.user{background:#157347;margin-left:auto}.footer{text-align:center;padding:18px;border-top:1px solid #243244}button{width:76px;height:76px;border:none;border-radius:50%;font-size:34px;background:#2893f0;color:#fff}#estado{margin-top:10px;color:#8bd3ff}.notice{position:fixed;inset:0;background:rgba(0,0,0,.82);display:none;align-items:center;justify-content:center}.card{background:#172235;padding:24px;border-radius:20px;width:90%;max-width:420px;text-align:center}.card a,.card button{display:block;margin:12px auto;padding:12px 18px;border-radius:12px;border:none;text-decoration:none}
+</style></head><body>
+<div class='chat'><div class='header'>🤖 Agente IA - Control de Legalidad</div><div class='messages' id='chat'><div class='bot'>Hola 👋<br><br>Di:<br><b>Dame el control de legalidad para constitución</b><br><br>o<br><b>...para nombramiento</b></div></div><div class='footer'><button id='mic'>🎤</button><div id='estado'>Pulsa para hablar</div></div></div>
+<div id='safariNotice' class='notice'><div class='card'><h2>🍎 Safari detectado</h2><p>La experiencia por voz funciona mejor en Google Chrome.</p><a id='chromeLink' href='#' style='background:#2893f0;color:#fff'>🚀 Intentar abrir en Chrome</a><button onclick='document.getElementById("safariNotice").style.display="none"'>Continuar en Safari</button></div></div>
+<script>
+const ua=navigator.userAgent;
+const safari=/Safari/i.test(ua)&&!/Chrome|CriOS|Edg/i.test(ua);
+if(safari){
+document.getElementById('safariNotice').style.display='flex';
+document.getElementById('chromeLink').onclick=function(e){
+e.preventDefault();
+location.href=location.href.replace(/^https/,'googlechrome');
+};
+}
+const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+if(SR){
+const r=new SR();r.lang='es-CO';
+mic.onclick=()=>{estado.textContent='🎙️ Escuchando...';r.start();};
+r.onresult=e=>{
+let t=e.results[0][0].transcript.toLowerCase();
+chat.innerHTML+=`<div class='user'>${t}</div>`;
+let ans='No encontré ese trámite.';
+if(t.includes('constit'))ans='✅ Homonimia<br>✅ Objeto social<br>✅ Capitales<br>✅ Firma representante legal';
+if(t.includes('nombramiento'))ans='✅ Órgano competente<br>✅ Cumple quórum<br>✅ Cumple convocatoria<br>✅ Cumple SIPREF';
+setTimeout(()=>{chat.innerHTML+=`<div class='bot'>${ans}</div>`;chat.scrollTop=chat.scrollHeight;let u=new SpeechSynthesisUtterance(ans.replace(/<[^>]+>/g,''));u.lang='es-CO';speechSynthesis.speak(u);estado.textContent='Consulta finalizada';},600);
+};
+r.onerror=e=>estado.textContent='❌ '+e.error;
+}else estado.textContent='Voz no compatible en este navegador';
+</script></body></html>
